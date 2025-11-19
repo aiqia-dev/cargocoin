@@ -1,5 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2022 The Bitcoin Core developers
+// Copyright (c) 2025 The CargoCoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -7,16 +8,17 @@
 #define BITCOIN_PRIMITIVES_BLOCK_H
 
 #include <primitives/transaction.h>
+#include <primitives/drivingdata.h>
 #include <serialize.h>
 #include <uint256.h>
 #include <util/time.h>
 
-/** Nodes collect new transactions into a block, hash them into a hash tree,
- * and scan through nonce values to make the block's hash satisfy proof-of-work
- * requirements.  When they solve the proof-of-work, they broadcast the block
- * to everyone and the block is added to the block chain.  The first transaction
- * in the block is a special one that creates a new coin owned by the creator
- * of the block.
+/** CargoCoin: Nodes collect new transactions into a block and collect
+ * safe driving data to satisfy proof-of-safe-driving requirements.
+ * When they provide valid driving evidence, they broadcast the block
+ * to everyone and the block is added to the block chain. The first transaction
+ * in the block is a special one that creates new coins owned by the driver
+ * who created the block through safe driving.
  */
 class CBlockHeader
 {
@@ -29,12 +31,18 @@ public:
     uint32_t nBits;
     uint32_t nNonce;
 
+    // CargoCoin: Proof-of-Safe-Driving data
+    uint256 hashDrivingData; // Hash of the driving data for this block
+    uint32_t drivingScore;    // Calculated driving score (0-1000)
+
     CBlockHeader()
     {
         SetNull();
     }
 
-    SERIALIZE_METHODS(CBlockHeader, obj) { READWRITE(obj.nVersion, obj.hashPrevBlock, obj.hashMerkleRoot, obj.nTime, obj.nBits, obj.nNonce); }
+    SERIALIZE_METHODS(CBlockHeader, obj) {
+        READWRITE(obj.nVersion, obj.hashPrevBlock, obj.hashMerkleRoot, obj.nTime, obj.nBits, obj.nNonce, obj.hashDrivingData, obj.drivingScore);
+    }
 
     void SetNull()
     {
@@ -44,6 +52,8 @@ public:
         nTime = 0;
         nBits = 0;
         nNonce = 0;
+        hashDrivingData.SetNull();
+        drivingScore = 0;
     }
 
     bool IsNull() const
@@ -71,10 +81,14 @@ public:
     // network and disk
     std::vector<CTransactionRef> vtx;
 
+    // CargoCoin: Full driving data for this block
+    CDrivingData drivingData;
+
     // Memory-only flags for caching expensive checks
     mutable bool fChecked;                            // CheckBlock()
     mutable bool m_checked_witness_commitment{false}; // CheckWitnessCommitment()
     mutable bool m_checked_merkle_root{false};        // CheckMerkleRoot()
+    mutable bool m_checked_driving_data{false};       // CheckDrivingData()
 
     CBlock()
     {
@@ -89,16 +103,18 @@ public:
 
     SERIALIZE_METHODS(CBlock, obj)
     {
-        READWRITE(AsBase<CBlockHeader>(obj), obj.vtx);
+        READWRITE(AsBase<CBlockHeader>(obj), obj.vtx, obj.drivingData);
     }
 
     void SetNull()
     {
         CBlockHeader::SetNull();
         vtx.clear();
+        drivingData.SetNull();
         fChecked = false;
         m_checked_witness_commitment = false;
         m_checked_merkle_root = false;
+        m_checked_driving_data = false;
     }
 
     CBlockHeader GetBlockHeader() const
@@ -110,6 +126,8 @@ public:
         block.nTime          = nTime;
         block.nBits          = nBits;
         block.nNonce         = nNonce;
+        block.hashDrivingData = hashDrivingData;
+        block.drivingScore   = drivingScore;
         return block;
     }
 

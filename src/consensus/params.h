@@ -1,5 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2022 The Bitcoin Core developers
+// Copyright (c) 2025 The CargoCoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -8,6 +9,7 @@
 
 #include <script/verify_flags.h>
 #include <uint256.h>
+#include <primitives/drivingdata.h>
 
 #include <array>
 #include <chrono>
@@ -135,6 +137,9 @@ struct Params {
      */
     bool signet_blocks{false};
     std::vector<uint8_t> signet_challenge;
+
+    /** CargoCoin: Proof-of-Safe-Driving parameters */
+    SafeDrivingParams safeDrivingParams;
 
     int DeploymentHeight(BuriedDeployment dep) const
     {
