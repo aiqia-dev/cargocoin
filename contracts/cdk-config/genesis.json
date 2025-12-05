@@ -1,0 +1,59 @@
+{
+  "$schema": "https://raw.githubusercontent.com/0xPolygon/cdk-validium-node/main/config/genesis.schema.json",
+  "_comment": "CargoCoin Chain (L3) - Genesis Configuration",
+  "_comment2": "Gas Token: CargoCoin (CC) - Custom ERC-20 from L1",
+
+  "l1Config": {
+    "chainId": 137,
+    "_comment": "Polygon PoS Mainnet (use 80002 for Amoy testnet)",
+    "polygonZkEVMAddress": "",
+    "polygonRollupManagerAddress": "",
+    "polTokenAddress": "",
+    "polygonZkEVMGlobalExitRootAddress": "",
+    "polygonZkEVMBridgeAddress": "",
+    "gasTokenAddress": "CARGOCOIN_L1_ADDRESS_PLACEHOLDER",
+    "_gasTokenComment": "Endereço do CargoCoinL1 na Polygon PoS"
+  },
+
+  "genesisBlockNumber": 0,
+
+  "root": "0x0000000000000000000000000000000000000000000000000000000000000000",
+
+  "genesis": [
+    {
+      "_comment": "Admin/Deployer Account - receives initial CC for deployment",
+      "contractName": "AdminAccount",
+      "balance": "100000000000000000000000000",
+      "nonce": "0",
+      "address": "ADMIN_ADDRESS_PLACEHOLDER"
+    },
+    {
+      "_comment": "Rewards Pool - pre-funded for driver rewards",
+      "contractName": "RewardsPool",
+      "balance": "400000000000000000000000000",
+      "nonce": "0",
+      "address": "REWARDS_POOL_ADDRESS_PLACEHOLDER"
+    },
+    {
+      "_comment": "Bridge Contract",
+      "contractName": "PolygonZkEVMBridge",
+      "balance": "0",
+      "nonce": "1",
+      "address": "0x2a3DD3EB832aF982ec71669E178424b10Dca2EDe"
+    },
+    {
+      "_comment": "Global Exit Root Manager L2",
+      "contractName": "PolygonZkEVMGlobalExitRootL2",
+      "balance": "0",
+      "nonce": "1",
+      "address": "0xa40D5f56745a118D0906a34E69aeC8C0Db1cB8fA"
+    }
+  ],
+
+  "gasTokenMetadata": {
+    "name": "CargoCoin",
+    "symbol": "CC",
+    "decimals": 18,
+    "_comment": "CC é o token nativo de gas da CargoCoin Chain"
+  }
+}
