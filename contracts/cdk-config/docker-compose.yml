@@ -1,0 +1,130 @@
+# =============================================================================
+# CargoCoin Chain (L3) - Docker Compose
+# =============================================================================
+# Polygon CDK infrastructure for CargoCoin Chain
+# Gas Token: CargoCoin (CC)
+# =============================================================================
+
+version: '3.8'
+
+services:
+  # ---------------------------------------------------------------------------
+  # PostgreSQL Database
+  # ---------------------------------------------------------------------------
+  postgres:
+    image: postgres:15
+    container_name: cargocoin-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: cargocoin
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-cargocoin_secret}
+      POSTGRES_DB: cargocoin_node
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cargocoin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ---------------------------------------------------------------------------
+  # CDK Node (Sequencer)
+  # ---------------------------------------------------------------------------
+  cdk-node:
+    image: hermeznetwork/cdk-validium-node:latest
+    container_name: cargocoin-node
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - CDK_NODE_STATEDB_HOST=postgres
+      - CDK_NODE_POOL_DB_HOST=postgres
+    volumes:
+      - ./node-config.toml:/app/config.toml:ro
+      - ./genesis.json:/app/genesis.json:ro
+      - node_data:/var/lib/cargocoin
+    ports:
+      - "8545:8545"   # JSON-RPC HTTP
+      - "8546:8546"   # JSON-RPC WebSocket
+      - "9091:9091"   # Metrics
+    command: ["run", "--cfg", "/app/config.toml", "--genesis", "/app/genesis.json"]
+
+  # ---------------------------------------------------------------------------
+  # Block Explorer (Blockscout)
+  # ---------------------------------------------------------------------------
+  blockscout:
+    image: blockscout/blockscout:latest
+    container_name: cargocoin-explorer
+    restart: unless-stopped
+    depends_on:
+      - cdk-node
+      - postgres-explorer
+    environment:
+      ETHEREUM_JSONRPC_VARIANT: geth
+      ETHEREUM_JSONRPC_HTTP_URL: http://cdk-node:8545
+      ETHEREUM_JSONRPC_WS_URL: ws://cdk-node:8546
+      DATABASE_URL: postgresql://blockscout:blockscout@postgres-explorer:5432/blockscout
+      NETWORK: CargoCoin Chain
+      SUBNETWORK: CargoCoin
+      CHAIN_ID: 776655
+      COIN: CC
+      COIN_NAME: CargoCoin
+    ports:
+      - "4000:4000"
+
+  postgres-explorer:
+    image: postgres:15
+    container_name: cargocoin-explorer-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: blockscout
+      POSTGRES_PASSWORD: blockscout
+      POSTGRES_DB: blockscout
+    volumes:
+      - explorer_data:/var/lib/postgresql/data
+
+  # ---------------------------------------------------------------------------
+  # Prometheus (Metrics)
+  # ---------------------------------------------------------------------------
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: cargocoin-prometheus
+    restart: unless-stopped
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+
+  # ---------------------------------------------------------------------------
+  # Grafana (Dashboard)
+  # ---------------------------------------------------------------------------
+  grafana:
+    image: grafana/grafana:latest
+    container_name: cargocoin-grafana
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+    volumes:
+      - grafana_data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+
+volumes:
+  postgres_data:
+  node_data:
+  explorer_data:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  default:
+    name: cargocoin-network

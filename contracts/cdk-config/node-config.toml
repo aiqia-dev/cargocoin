@@ -1,0 +1,177 @@
+# =============================================================================
+# CargoCoin Chain (L3) - Node Configuration
+# =============================================================================
+# Polygon CDK Validium/Rollup Node Configuration
+# Gas Token: CargoCoin (CC)
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Network Configuration
+# -----------------------------------------------------------------------------
+
+[Network]
+# Chain ID for CargoCoin Chain (choose unique ID)
+ChainID = 776655
+# Network name
+Name = "CargoCoin Chain"
+
+# -----------------------------------------------------------------------------
+# L1 Configuration (Polygon PoS)
+# -----------------------------------------------------------------------------
+
+[L1]
+# Polygon PoS RPC (use your own node or service)
+URL = "https://polygon-rpc.com"
+# WebSocket URL for events
+WSURL = "wss://polygon-rpc.com"
+# Chain ID (137 = Polygon Mainnet, 80002 = Amoy Testnet)
+ChainID = 137
+
+# -----------------------------------------------------------------------------
+# Gas Token Configuration
+# -----------------------------------------------------------------------------
+
+[GasToken]
+# Enable custom gas token (CargoCoin)
+Enabled = true
+# Address of CargoCoinL1 on Polygon PoS
+L1Address = "CARGOCOIN_L1_ADDRESS_PLACEHOLDER"
+# Token decimals (18 for CC)
+Decimals = 18
+# Token symbol
+Symbol = "CC"
+# Token name
+Name = "CargoCoin"
+
+# -----------------------------------------------------------------------------
+# Sequencer Configuration
+# -----------------------------------------------------------------------------
+
+[Sequencer]
+# Enable sequencer mode
+Enabled = true
+# Address of sequencer
+Address = "SEQUENCER_ADDRESS_PLACEHOLDER"
+# Maximum batch size
+MaxBatchSize = 100000
+# Batch timeout in seconds
+BatchTimeout = 5
+# Minimum gas price in wei (0.001 CC = 1e15 wei)
+MinGasPrice = 1000000000000000
+# Maximum gas per transaction
+MaxGasPerTx = 30000000
+
+# -----------------------------------------------------------------------------
+# RPC Configuration
+# -----------------------------------------------------------------------------
+
+[RPC]
+# Enable JSON-RPC
+Enabled = true
+# RPC server address
+Host = "0.0.0.0"
+# RPC server port
+Port = 8545
+# WebSocket port
+WSPort = 8546
+# Enable WebSocket
+WSEnabled = true
+# Maximum concurrent requests
+MaxRequestsPerIPAndSecond = 100
+# Enable debug namespace
+EnableDebug = false
+
+# Supported namespaces
+[RPC.EnabledAPIs]
+eth = true
+net = true
+web3 = true
+txpool = true
+zkevm = true
+
+# -----------------------------------------------------------------------------
+# Database Configuration
+# -----------------------------------------------------------------------------
+
+[Database]
+# Database type
+Type = "postgres"
+# Connection string
+Host = "localhost"
+Port = 5432
+User = "cargocoin"
+Password = "CHANGE_ME_IN_PRODUCTION"
+Name = "cargocoin_node"
+MaxConns = 200
+
+# -----------------------------------------------------------------------------
+# Metrics Configuration
+# -----------------------------------------------------------------------------
+
+[Metrics]
+# Enable Prometheus metrics
+Enabled = true
+# Metrics server address
+Host = "0.0.0.0"
+# Metrics server port
+Port = 9091
+
+# -----------------------------------------------------------------------------
+# Log Configuration
+# -----------------------------------------------------------------------------
+
+[Log]
+# Log level: debug, info, warn, error
+Level = "info"
+# Output format: json, text
+Format = "json"
+# Output: stdout, stderr, or file path
+Output = "stdout"
+
+# -----------------------------------------------------------------------------
+# Prover Configuration (for Validium/Rollup)
+# -----------------------------------------------------------------------------
+
+[Prover]
+# Prover server URL
+URL = "PROVER_URL_PLACEHOLDER"
+# Request timeout
+Timeout = "5m"
+# Retry interval
+RetryInterval = "10s"
+
+# -----------------------------------------------------------------------------
+# Synchronizer Configuration
+# -----------------------------------------------------------------------------
+
+[Synchronizer]
+# Sync mode: full, light
+Mode = "full"
+# L1 sync interval
+L1SyncInterval = "1s"
+# Initial block to sync from
+InitialBlock = 0
+
+# -----------------------------------------------------------------------------
+# Transaction Pool Configuration
+# -----------------------------------------------------------------------------
+
+[TxPool]
+# Maximum pending transactions
+MaxPending = 10000
+# Maximum queued transactions
+MaxQueued = 10000
+# Transaction lifetime
+Lifetime = "3h"
+# Minimum gas price to accept
+MinGasPrice = 1000000000000000
+
+# -----------------------------------------------------------------------------
+# State Configuration
+# -----------------------------------------------------------------------------
+
+[State]
+# State database path
+Path = "/var/lib/cargocoin/state"
+# Maximum batch gas limit
+MaxBatchGasLimit = 30000000

@@ -44,12 +44,27 @@ const config: HardhatUserConfig = {
       chainId: 80002,
       gasPrice: 35000000000, // 35 gwei
     },
+    // CargoCoin Chain (L3) - Custom gas token (CC)
+    cargocoin: {
+      url: process.env.CARGOCOIN_RPC_URL || "http://localhost:8545",
+      accounts: [PRIVATE_KEY],
+      chainId: 776655,
+      gasPrice: 1000000000000000, // 0.001 CC
+    },
+    // CargoCoin Chain Testnet
+    cargocoinTestnet: {
+      url: process.env.CARGOCOIN_TESTNET_RPC_URL || "http://localhost:8545",
+      accounts: [PRIVATE_KEY],
+      chainId: 776656,
+      gasPrice: 1000000000000000,
+    },
   },
   etherscan: {
     apiKey: {
       polygon: POLYGONSCAN_API_KEY,
       polygonMumbai: POLYGONSCAN_API_KEY,
       polygonAmoy: POLYGONSCAN_API_KEY,
+      cargocoin: "no-api-key-needed",
     },
     customChains: [
       {
@@ -58,6 +73,14 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: "https://api-amoy.polygonscan.com/api",
           browserURL: "https://amoy.polygonscan.com",
+        },
+      },
+      {
+        network: "cargocoin",
+        chainId: 776655,
+        urls: {
+          apiURL: process.env.CARGOCOIN_EXPLORER_API || "http://localhost:4000/api",
+          browserURL: process.env.CARGOCOIN_EXPLORER_URL || "http://localhost:4000",
         },
       },
     ],

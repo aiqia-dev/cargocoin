@@ -6,13 +6,18 @@
     "compile": "hardhat compile",
     "test": "hardhat test",
     "test:coverage": "hardhat coverage",
-    "deploy:localhost": "hardhat run scripts/deploy.ts --network localhost",
-    "deploy:mumbai": "hardhat run scripts/deploy.ts --network mumbai",
-    "deploy:polygon": "hardhat run scripts/deploy.ts --network polygon",
     "node": "hardhat node",
     "clean": "hardhat clean",
     "typechain": "hardhat typechain",
-    "verify": "hardhat verify"
+    "verify": "hardhat verify",
+    "deploy:l1:localhost": "hardhat run scripts/deploy-l1.ts --network localhost",
+    "deploy:l1:amoy": "hardhat run scripts/deploy-l1.ts --network amoy",
+    "deploy:l1:polygon": "hardhat run scripts/deploy-l1.ts --network polygon",
+    "deploy:l3:localhost": "hardhat run scripts/deploy-l3.ts --network localhost",
+    "deploy:l3:testnet": "hardhat run scripts/deploy-l3.ts --network cargocoinTestnet",
+    "deploy:l3:mainnet": "hardhat run scripts/deploy-l3.ts --network cargocoin",
+    "deploy:all:testnet": "npm run deploy:l1:amoy && npm run deploy:l3:testnet",
+    "deploy:all:mainnet": "npm run deploy:l1:polygon && npm run deploy:l3:mainnet"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.0",
